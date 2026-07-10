@@ -24,8 +24,7 @@ class _TodosScreenState extends State<TodosScreen> {
     _fetchTodos();
   }
 
-  void _fetchTodos() async {
-    TodoRepository repository = TodoRepository.global;
+
     //  TODO
     // Fetch the list of todos from the repo
     // Handle the success, loading and error cases (catch exception)
@@ -33,7 +32,7 @@ class _TodosScreenState extends State<TodosScreen> {
 
     // List<Todo> todos = await repository.getTodos();
     // setState(() => asyncData = AsyncData.success(todos),);
-      void _fetchTodos() async { //step1 fetch data
+    void _fetchTodos() async { //step1 fetch data
     TodoRepository repository = TodoRepository.global; 
     setState(() { 
       asyncData = AsyncData.loading(); 
