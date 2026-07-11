@@ -10,28 +10,32 @@ void main() {
     ),
   );
 }
-
 class Button {
   final String title;
   final bool selected;
-
-  Button({required this.title, required this.selected});
+  Button({
+    required this.title,
+    required this.selected,
+  });
   static Button fromJson(Map<String, dynamic> json) {
     const String titleKey = 'title';
     const String selectedKey = 'selected';
     assert(json[titleKey] is String);
     assert(json[selectedKey] is bool);
-    return Button(title: json[titleKey], selected: json[selectedKey]);
+    return Button(
+      title: json[titleKey],
+      selected: json[selectedKey],
+    );
   }
 }
 
 class Repo {
   static final Repo instance = Repo();
+  final String fireUrl =
+      "https://buttomstatus-default-rtdb.asia-southeast1.firebasedatabase.app/buttonstatus.json";
   Future<Button> getData() async {
     try {
-      final url = Uri.parse(
-        "https://buttomstatus-default-rtdb.asia-southeast1.firebasedatabase.app/buttonstatus.json",
-      );
+      final url = Uri.parse(fireUrl);
       final response = await http.get(url);
       if (response.statusCode != 200) {
         throw Exception("Failed : ${response.statusCode}");
@@ -42,16 +46,34 @@ class Repo {
       throw Exception("Connection Error : $e");
     }
   }
+  //  update patch
+  Future<void> updateSelected(bool selected) async {
+    try {
+      final url = Uri.parse(fireUrl);
+      final response = await http.patch(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "selected": selected,
+        }),
+      );
+      if (response.statusCode != 200) {
+        throw Exception("Failed : ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Update Error : $e");
+    }
+  }
 }
 
 enum AsyncState { loading, success, error }
-
 class SelectedButton extends StatefulWidget {
   const SelectedButton({super.key});
   @override
   State<SelectedButton> createState() => SelectedButtonState();
 }
-
 class SelectedButtonState extends State<SelectedButton> {
   AsyncState state = AsyncState.loading;
   Button? button;
@@ -61,55 +83,79 @@ class SelectedButtonState extends State<SelectedButton> {
     super.initState();
     fetchButton();
   }
-
   Future<void> fetchButton() async {
     setState(() {
       state = AsyncState.loading;
     });
     try {
       button = await Repo.instance.getData();
-      isSelect = button!.selected;
+      isSelect = button!.selected
       setState(() {
         state = AsyncState.success;
       });
     } catch (e) {
       print(e);
+
       setState(() {
         state = AsyncState.error;
       });
     }
   }
-
-  void onPress() {
+  Future<void> onPress() async {
+    final oldValue = isSelect;
+    final newValue = !isSelect;
     setState(() {
-      isSelect = !isSelect;
+      isSelect = newValue;
     });
+    try {
+      await Repo.instance.updateSelected(newValue);
+    } catch (e) {
+      setState(() {
+        isSelect = oldValue;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to update Firebase"),
+        ),
+      );
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     Widget body;
     switch (state) {
       case AsyncState.loading:
-        body = const Center(child: CircularProgressIndicator());
+        body = const Center(
+          child: CircularProgressIndicator(),
+        );
         break;
       case AsyncState.error:
-        body = const Center(child: Text("Error fetching data"));
+        body = const Center(
+          child: Text("Error fetching data"),
+        );
         break;
       case AsyncState.success:
         body = Center(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: isSelect ? Colors.blue : Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 40,
+                vertical: 20,
+              ),
             ),
             onPressed: onPress,
-            child: Text(button!.title, style: const TextStyle(fontSize: 20)),
+            child: Text(
+              button!.title,
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
         );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text("Button")),
+      appBar: AppBar(
+        title: const Text("Button"),
+      ),
       body: body,
     );
   }
