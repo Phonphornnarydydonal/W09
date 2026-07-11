@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import '../../models/todo.dart';
 
 class TodoDto {
@@ -14,19 +13,19 @@ class TodoDto {
     assert(
       json.containsKey(completed) && json[completed] is bool,
       "Missing or invalid completed status",
-    )
+    );
     return Todo(
       id: id,
       title: json[title] as String,
       completed: json[completed] as bool,
-    );}
-    static Map<String, dynamic> toJson(Todo todo) {
-      return {title: todo.title, completed: todo.completed};
-    }
+    );
   }
+  static Map<String, dynamic> toJson(Todo todo) {
+    return {title: todo.title, completed: todo.completed};
+  }
+}
 
 void main() {
-  // JSON string simulating Firebase "todos" collection
   const jsonString = '''
   {
     "1": {
@@ -43,19 +42,15 @@ void main() {
     }
   }
   ''';
-
-  // Decode JSON string into Map
   final Map<String, dynamic> data = jsonDecode(jsonString);
-
-  // Convert each entry using fromJson
   final List<Todo> todos = data.entries.map((entry) {
     final id = entry.key;
     final json = entry.value as Map<String, dynamic>;
     return TodoDto.fromJson(id, json);
   }).toList();
-}
   for (var todo in todos) {
-      print(
-        "Todo ID: ${todo.id}, Title: ${todo.title}, Completed: ${todo.completed}",
-      );
-    }
+    print(
+      "Todo ID: ${todo.id}, Title: ${todo.title}, Completed: ${todo.completed}",
+    );
+  }
+}
