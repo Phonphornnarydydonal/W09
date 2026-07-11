@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
-
 import '../../../models/todo.dart';
 import '../../theme/app_screen.dart';
 
 class TodoCard extends StatelessWidget {
   const TodoCard({super.key, required this.todo, required this.onTap});
-
   final Todo todo;
   final ValueChanged<Todo> onTap;
- 
 
   //  TODO
   //  Update the widget to disaply both state (completed / not completed) as required
   //
-  TextDecoration? get textDecoration => TextDecoration.lineThrough;
+  TextDecoration? get textDecoration => 
     todo.completed ? TextDecoration.lineThrough : null;
-  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -28,7 +24,6 @@ class TodoCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border: BoxBorder.all(width: 2, color: AppTheme.yellowColor),
           ),
-
           child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: Row(
@@ -52,7 +47,6 @@ class TodoCard extends StatelessWidget {
 
 class CheckBox extends StatelessWidget {
   const CheckBox({super.key, required this.checked});
-
   final bool checked;
 
 
@@ -65,7 +59,6 @@ class CheckBox extends StatelessWidget {
       checked ? AppTheme.greenColor : Colors.transparent;
   Widget? get innerIcon =>
       checked ? Icon(Icons.check, color: Colors.white) : null;
-  
   @override
   Widget build(BuildContext context) {
     return Container(
