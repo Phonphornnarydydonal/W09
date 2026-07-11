@@ -10,6 +10,7 @@ void main() {
     ),
   );
 }
+
 class Button {
   final String title;
   final bool selected;
@@ -46,7 +47,6 @@ class Repo {
       throw Exception("Connection Error : $e");
     }
   }
-  //  update patch
   Future<void> updateSelected(bool selected) async {
     try {
       final url = Uri.parse(fireUrl);
@@ -67,7 +67,6 @@ class Repo {
     }
   }
 }
-
 enum AsyncState { loading, success, error }
 class SelectedButton extends StatefulWidget {
   const SelectedButton({super.key});
@@ -89,18 +88,18 @@ class SelectedButtonState extends State<SelectedButton> {
     });
     try {
       button = await Repo.instance.getData();
-      isSelect = button!.selected
+      isSelect = button!.selected;
       setState(() {
         state = AsyncState.success;
       });
     } catch (e) {
       print(e);
-
       setState(() {
         state = AsyncState.error;
       });
     }
   }
+
   Future<void> onPress() async {
     final oldValue = isSelect;
     final newValue = !isSelect;
